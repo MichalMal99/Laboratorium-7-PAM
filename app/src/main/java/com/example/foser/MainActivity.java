@@ -41,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), "" + buttonStart.getText().toString(), Toast.LENGTH_SHORT).show();
             }
         });
-
+//komentarz
         buttonStop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
