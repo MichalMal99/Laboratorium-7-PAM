@@ -20,25 +20,30 @@ import androidx.preference.PreferenceManager;
 
 public class MainActivity extends AppCompatActivity {
 
-    private Button buttonStart, buttonStop, buttonRestart;
-    private TextView textInfoService, textInfoSettings;
     private String message;
     private Boolean show_time, work, work_double;
+    private Button buttonStart;
+    private Button buttonStop;
+    private Button buttonRestart;
+    private TextView textInfoService, textInfoSettings;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        final Button buttonStart = (Button)findViewById(R.id.buttonStart);
-        final Button buttonStop = (Button)findViewById(R.id.buttonStop);
-        final Button buttonRestart = (Button)findViewById(R.id.buttonRestart);
-        textInfoService = (TextView)findViewById(R.id.textInfoServiceState);
+        buttonStart = (Button)findViewById(R.id.buttonStart);
+        buttonStop = (Button)findViewById(R.id.buttonStop);
+        buttonRestart = (Button)findViewById(R.id.buttonRestart);
+        textInfoService = (TextView) findViewById(R.id.textInfoServiceState);
         textInfoSettings = (TextView) findViewById(R.id.textInfoSettings);
 
         buttonStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Toast.makeText(getApplicationContext(), "" + buttonStart.getText().toString(), Toast.LENGTH_SHORT).show();
+                clickStart(v);
+
             }
         });
 
@@ -46,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Toast.makeText(getApplicationContext(), "" + buttonStop.getText().toString(), Toast.LENGTH_SHORT).show();
+                clickStop(v);
             }
         });
 
@@ -53,10 +59,29 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Toast.makeText(getApplicationContext(), "" + buttonRestart.getText().toString(), Toast.LENGTH_SHORT).show();
+                clickRestart(v);
             }
         });
 
+        updateUI();
+        textInfoSettings.setText(getPreferences());
+
     }
+
+    private String getPreferences(){
+
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        message = sharedPreferences.getString("message","ForSer");
+        show_time = sharedPreferences.getBoolean("show_time", true);
+        work = sharedPreferences.getBoolean("sync",true);
+        work_double = sharedPreferences.getBoolean("double", false);
+
+        return "Message: " + message + "\n"
+                +"show_time: " + show_time.toString() +"\n"
+                +"work: " + work.toString() + "\n"
+                +"double: " + work_double.toString();
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_menu,menu);
@@ -74,17 +99,15 @@ public class MainActivity extends AppCompatActivity {
 
     public void clickStart(View view) {
 
-        getPreferences();
 
         Intent startIntent = new Intent(this,MyForegroundService.class);
         startIntent.putExtra(MyForegroundService.MESSAGE,message);
         startIntent.putExtra(MyForegroundService.TIME,show_time);
         startIntent.putExtra(MyForegroundService.WORK,work);
         startIntent.putExtra(MyForegroundService.WORK_DOUBLE,work_double);
-
-
         ContextCompat.startForegroundService(this, startIntent);
         updateUI();
+
     }
 
     public void clickStop(View view) {
@@ -100,19 +123,6 @@ public class MainActivity extends AppCompatActivity {
         clickStart(view);
     }
 
-    private String getPreferences(){
-
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        message = sharedPreferences.getString("message","ForSer");
-        show_time = sharedPreferences.getBoolean("show_time", true);
-        work = sharedPreferences.getBoolean("sync",true);
-        work_double = sharedPreferences.getBoolean("double", false);
-
-        return "Message: " + message + "\n"
-                +"show_time: " + show_time.toString() +"\n"
-                +"work: " + work.toString() + "\n"
-                +"double: " + work_double.toString();
-    }
 
     private void updateUI(){
 
